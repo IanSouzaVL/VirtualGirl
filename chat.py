@@ -6,9 +6,12 @@ model = "llama3.1:8b-instruct-q4_K_M"
 with open("mensagens.json", "r", encoding="utf-8") as arquivo:
     mensagens = json.load(arquivo)
 
+with open("personagem.json", "r", encoding="utf-8") as arquivo:
+    system = json.load(arquivo)
+
 dados = {
     "model": model,
-    "messages": mensagens,
+    "messages": [system] + mensagens,
     "stream": False
 }
 
@@ -22,12 +25,16 @@ dados["messages"].append(
     }
 )
 
-r = requests.post(url, json=dados, timeout=60)
-r.raise_for_status()
+try:
+    r = requests.post(url, json=dados, timeout=60)
+    r.raise_for_status()
 
-ia_message_dict = r.json()["message"]
+    ia_message_dict = r.json()["message"]
 
-mensagens.append(ia_message_dict)
+    mensagens.append(ia_message_dict)
 
-write_json(mensagens)
-print(ia_message_dict["content"])
+    write_json(mensagens)
+    print(ia_message_dict["content"])
+
+except requests.RequestException as e:
+    print(f"Erro: {e}")
