@@ -1,7 +1,7 @@
 from utilitarios import *
 import json, requests
-# url = "http://10.234.184.44:11434/api/chat"
-url = "http://192.168.18.9:11434/api/chat"
+url = "http://10.234.184.44:11434/api/chat"
+# url = "http://192.168.18.9:11434/api/chat"
 model = "llama3.1:8b-instruct-q4_K_M"
 
 with open("mensagens.json", "r", encoding="utf-8") as arquivo:
