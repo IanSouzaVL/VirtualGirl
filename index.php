@@ -25,15 +25,59 @@
     <div class="resp">
         <p id="p"></p>      
             <?php
+            $url = "http://192.168.18.9:11434/api/chat";
+
+            $curl = curl_init($url);
+
+            curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
+            curl_setopt($curl, CURLOPT_POST, true);
+            curl_setopt($curl, CURLOPT_HTTPHEADER, [
+                "Content-Type: application/json",
+                "Accept: application/json"
+            ]);
 
             if (isset($_GET['msg'])) {
                 $msg = $_GET['msg'];
+
+                $personagem = file_get_contents("personagem.json");
+                $personagem_array = [json_decode($personagem, true)];
+
+                $mensagens = file_get_contents("mensagens.json");
+                $mensagens_array = json_decode($mensagens, true);
                 
+                $mensagens_array[] = [
+                    "role" => "user",
+                    "content" => $msg
+                ];
 
+                $m = array_merge($personagem_array, $mensagens_array);
 
+                $dados = [
+                    "model" => "llama3.1:8b-instruct-q4_K_M",
+                    "messages" => $m,
+                    "stream" => false
+                ];
 
+                $json = json_encode($dados);
+
+                curl_setopt($curl, CURLOPT_POSTFIELDS, $json);
+                
+                $resposta_txt = curl_exec($curl);
+                // true para transformar o txt em array ao enves de objeto
+                $resposta_array = json_decode($resposta_txt, true);
+
+                $resposta = $resposta_array["message"];
+                $p = $resposta["content"];
+
+                $m_novo = array_merge($mensagens_array, [$resposta]);
+                $m_json = json_encode($m_novo, JSON_PRETTY_PRINT | JSON_UNESCAPED_UNICODE);
+
+                file_put_contents(
+                    "mensagens.json",
+                    $m_json
+                );
                 ?><script>
-                    document.getElementById('p').innerText = "Eu não estou brava, só estou cansada de ter que explicar as coisas o tempo inteiro. Sabe, tem horas que eu fico pensando se as pessoas realmente entendem o que é estar sobrecarregada, tentando lidar com tantas coisas ao mesmo tempo. Não é questão de ser bravo ou nervoso, é só uma sensação de estar sendo puxada para todos os lados e, mesmo assim, ser a última a ser ouvida. Isso cansa, sabe? E quando eu fico quieta ou pareço distante, não é porque estou brava, é só uma forma de proteger a minha paz, de não permitir que tudo ao redor me sobrecarregue ainda mais. É difícil às vezes equilibrar tudo, manter a calma e o sorriso, quando tudo que eu quero é poder ser ouvida de verdade, sem que as pessoas pensem que minha expressão fechada é um sinal de raiva. Mas ok, se você acha que estou brava, então talvez seja a maneira que tenho de me proteger. Só não me interprete errado, por favor.";
+                    document.getElementById('p').innerText = <?php echo json_encode($p); ?>;
                     document.getElementById('main').style.backgroundImage = "var(--girl-1)"
                 </script><?php
                 
