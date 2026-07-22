@@ -25,7 +25,7 @@
     <div class="resp">
         <p id="p"></p>      
             <?php
-            $url = "http://192.168.18.9:11434/api/chat";
+            $url = "http://10.234.184.44:11434/api/chat";
 
             $curl = curl_init($url);
 
@@ -78,7 +78,7 @@
                 );
                 ?><script>
                     document.getElementById('p').innerText = <?php echo json_encode($p); ?>;
-                    document.getElementById('main').style.backgroundImage = "var(--girl-1)"
+                    // document.getElementById('main').style.backgroundImage = "var(--girl-1)"
                 </script><?php
                 
             } else {
