@@ -39,6 +39,13 @@
             if (isset($_GET['msg'])) {
                 $msg = $_GET['msg'];
 
+                if ($msg == "/clear") {
+                    $clear = [];
+                    file_put_contents("mensagens.json", json_encode($clear));
+                    header("Location: " . $_SERVER['PHP_SELF']);
+                    exit;
+                };
+
                 $personagem = file_get_contents("personagem.json");
                 $personagem_array = [json_decode($personagem, true)];
 
@@ -55,7 +62,8 @@
                 $dados = [
                     "model" => "llama3.1:8b-instruct-q4_K_M",
                     "messages" => $m,
-                    "stream" => false
+                    "stream" => false,
+                    "keep_alive" => "10m"
                 ];
 
                 $json = json_encode($dados);
